@@ -1,0 +1,20 @@
+# Example: Local CSV File Translation
+
+dataset:
+  source: "data/my_dataset.csv"
+  columns_to_translate: ["text", "description"]
+
+translation:
+  primary_api: fanar  # Using Fanar as primary
+  enable_fallback: false
+  normalize_provider_terms: false  # Keep original terms
+  preserve_all_columns: true
+
+apis:
+  fanar:
+    rate_limit_rpm: 40
+
+output:
+  path: data/my_dataset_arabic.csv
+  format: csv
+  save_statistics: true

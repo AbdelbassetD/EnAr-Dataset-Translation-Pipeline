@@ -1,0 +1,17 @@
+# Example: Kaggle Dataset Translation
+
+dataset:
+  source: "kaggle:username/dataset-name"
+  file_name: null  # Optional: specify if dataset has multiple files
+  columns_to_translate: auto
+
+translation:
+  primary_api: nvidia
+  enable_fallback: false
+  normalize_provider_terms: true
+  preserve_all_columns: true
+
+output:
+  path: data/kaggle_translated.csv
+  format: csv
+  save_statistics: true

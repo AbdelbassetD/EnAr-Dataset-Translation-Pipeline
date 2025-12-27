@@ -1,0 +1,16 @@
+# Example: HuggingFace Dataset Translation
+
+dataset:
+  source: "dvilasuero/jailbreak_gpt_oss_120b"
+  columns_to_translate: ["prompt"]
+
+translation:
+  primary_api: nvidia
+  enable_fallback: true  # Use Fanar if NVIDIA fails
+  normalize_provider_terms: true
+  preserve_all_columns: true
+
+output:
+  path: data/jailbreak_translated.csv
+  format: csv
+  save_statistics: true

@@ -1,0 +1,50 @@
+# Dataset Configuration
+dataset:
+  source: null  # "kaggle:user/dataset", "huggingface:dataset", or "path/to/file.csv"
+  file_name: null  # For Kaggle datasets with multiple files (optional)
+  columns_to_translate: auto  # List of column names or "auto" to detect
+
+
+# Translation Settings
+translation:
+  primary_api: nvidia  # nvidia or fanar
+  enable_fallback: false  # Use secondary API if primary fails
+  normalize_provider_terms: true  # Replace ChatGPT/OpenAI with generic terms
+  preserve_all_columns: true  # Keep all original columns in output
+
+
+# API Configuration (credentials, such as API keys, are loaded from .env)
+apis:
+  nvidia:
+    model: nvidia/riva-translate-4b-instruct-v1.1 # Model to use for translation
+    temperature: 0.1 # Temperature for sampling
+    max_tokens: 512 # Maximum number of tokens to generate
+    top_p: 0.7 # Top-p (nucleus) sampling
+    rate_limit_rpm: 40 # Rate limit in requests per minute
+  fanar:
+    model: Fanar
+    temperature: 0.3
+    max_tokens: 1024
+    rate_limit_rpm: 40
+
+
+# Retry & Performance
+retry:
+  max_retries: 5
+  backoff_multiplier: 2
+  request_timeout: 30
+  respect_rate_limits: true
+
+
+# Checkpointing
+checkpoint:
+  enabled: true
+  interval: 50  # Save every N rows
+  resume_from_last: false
+
+
+# Output
+output:
+  path: data/translated_output.csv
+  format: csv  # csv, json, or parquet
+  save_statistics: true
