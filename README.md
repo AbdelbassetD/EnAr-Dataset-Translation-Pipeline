@@ -193,6 +193,7 @@ output:
   path: data/translated_output.csv
   format: csv                     # csv, json, or parquet
   save_statistics: true           # Save translation stats to JSON
+```
 
 ## 📁 Project Structure
 
@@ -219,7 +220,6 @@ DatasetTranslation/
 ├── logs/                     # Execution logs
 └── checkpoints/              # Progress checkpoints
 ```
-
 
 ## ✨ Features
 
