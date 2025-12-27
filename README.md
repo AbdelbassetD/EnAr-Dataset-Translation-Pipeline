@@ -81,6 +81,13 @@ python translate.py --config examples/kaggle_example.yaml
 
 ## ⚙️ Configuration
 
+You can configure the pipeline in **two ways** (or combine both):
+
+1. **config.yaml file** - Set defaults for repeated use
+2. **CLI arguments** - Override config.yaml for one-time changes
+
+**Priority**: CLI arguments > config.yaml > built-in defaults
+
 ### config.yaml Structure
 
 ```yaml
@@ -105,6 +112,87 @@ output:
 ```
 
 See `examples/` for complete configuration examples.
+
+### CLI Arguments Reference
+
+All CLI arguments override corresponding `config.yaml` settings:
+
+#### Configuration
+- `--config PATH` - Path to custom YAML config file (default: `config.yaml`)
+
+#### Dataset Options
+- `--dataset SOURCE` - Dataset source:
+  - Kaggle: `kaggle:user/dataset-name`
+  - HuggingFace: `user/dataset-name` or `huggingface:user/dataset`
+  - Local file: `path/to/file.csv`
+- `--input PATH` - Alias for `--dataset` (for local files)
+- `--file-name NAME` - Specific file within Kaggle dataset (if multiple files)
+- `--columns COL [COL ...]` - Columns to translate (space-separated) or `auto` for auto-detection
+
+#### Translation Options
+- `--api {nvidia,fanar}` - Primary translation API
+- `--fallback` - Enable fallback to secondary API if primary fails (default: disabled)
+- `--no-normalize` - Disable ChatGPT/OpenAI term normalization
+
+#### Output Options
+- `--output PATH` - Output file path (default: `data/translated_output.csv`)
+- `--format {csv,json,parquet}` - Output format (auto-detected from file extension)
+
+#### Performance Options
+- `--limit N` - Translate only first N rows (useful for testing)
+- `--no-checkpoint` - Disable checkpointing
+- `--resume` - Resume from last checkpoint
+
+### config.yaml Reference
+
+Complete configuration file structure:
+
+```yaml
+# Dataset Configuration
+dataset:
+  source: null                    # Required: dataset source
+  file_name: null                 # Optional: specific file in Kaggle dataset
+  columns_to_translate: auto      # "auto" or list of column names
+
+# Translation Settings
+translation:
+  primary_api: nvidia             # "nvidia" or "fanar"
+  enable_fallback: false          # Use secondary API if primary fails
+  normalize_provider_terms: true  # Replace ChatGPT/OpenAI with generic terms
+  preserve_all_columns: true      # Keep all original columns in output
+
+# API Configuration (credentials from .env)
+apis:
+  nvidia:
+    model: nvidia/riva-translate-4b-instruct-v1.1
+    temperature: 0.1              # 0.0-1.0, lower = more consistent
+    max_tokens: 512
+    top_p: 0.7
+    rate_limit_rpm: 40            # Requests per minute
+  fanar:
+    model: Fanar
+    temperature: 0.3
+    max_tokens: 1024
+    rate_limit_rpm: 40
+
+# Retry & Performance
+retry:
+  max_retries: 3                  # Retries per API call
+  backoff_multiplier: 2           # Exponential backoff multiplier
+  request_timeout: 30             # Seconds
+  respect_rate_limits: true       # Auto-throttle to stay within limits
+
+# Checkpointing
+checkpoint:
+  enabled: true
+  interval: 50                    # Save progress every N rows
+  resume_from_last: false
+
+# Output
+output:
+  path: data/translated_output.csv
+  format: csv                     # csv, json, or parquet
+  save_statistics: true           # Save translation stats to JSON
 
 ## 📁 Project Structure
 
