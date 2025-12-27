@@ -12,6 +12,6 @@ translation:
   preserve_all_columns: true
 
 output:
-  path: data/kaggle_translated.csv
+  path: data/kaggle_translated_ar.csv
   format: csv
   save_statistics: true

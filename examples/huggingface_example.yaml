@@ -1,7 +1,7 @@
 # Example: HuggingFace Dataset Translation
 
 dataset:
-  source: "dvilasuero/jailbreak_gpt_oss_120b"
+  source: "user/dataset-name"
   columns_to_translate: ["prompt"]
 
 translation:
@@ -11,6 +11,6 @@ translation:
   preserve_all_columns: true
 
 output:
-  path: data/jailbreak_translated.csv
+  path: data/jailbreak_translated_ar.csv
   format: csv
   save_statistics: true

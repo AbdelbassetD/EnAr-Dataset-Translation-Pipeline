@@ -61,7 +61,7 @@ python translate.py
 python translate.py --dataset kaggle:user/dataset-name --output data/out.csv
 
 # Translate HuggingFace dataset
-python translate.py --dataset dvilasuero/jailbreak_gpt_oss_120b --columns prompt
+python translate.py --dataset user/dataset-name --columns prompt
 
 # Translate local CSV
 python translate.py --input data/file.csv --columns text description --api nvidia
