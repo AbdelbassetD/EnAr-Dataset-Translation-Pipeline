@@ -120,7 +120,16 @@ class FanarClient:
 
 def main():
     # Example usage
-    API_KEY = "QBN1Fq92NwRyN9R3insS5n7YCt5LHie9"
+    import os
+    from dotenv import load_dotenv
+    
+    load_dotenv()
+    API_KEY = os.getenv("FANAR_API_KEY")
+    
+    if not API_KEY:
+        print("Error: FANAR_API_KEY not found in environment")
+        print("Please set it in .env file")
+        return
 
     # Initialize the client
     client = FanarClient(API_KEY)

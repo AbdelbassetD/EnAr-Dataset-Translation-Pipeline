@@ -2,11 +2,16 @@
 # Using the official prompt template from NVIDIA documentation
 
 from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-# Initialize client
+# Load environment variables
+load_dotenv()
+
+# Initialize client with API key from environment
 client = OpenAI(
-    base_url="https://integrate.api.nvidia.com/v1",
-    api_key="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"  # Get from https://build.nvidia.com
+    base_url=os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
+    api_key=os.getenv("NVIDIA_API_KEY")  # Get from .env file
 )
 
 def translate_en_to_ar(text, timeout=30):
