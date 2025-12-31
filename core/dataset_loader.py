@@ -49,42 +49,55 @@ class DatasetLoader:
         self,
         source: str,
         format: Optional[str] = None,
-        split: str = "train"
+        split: str = "train",
+        config_name: Optional[str] = None
     ) -> pd.DataFrame:
         """
         Load dataset from file or Hugging Face.
         
         Args:
-            source: File path or HuggingFace dataset name
+            source: File path, HuggingFace dataset name (prefix 'huggingface:'), or Kaggle dataset (prefix 'kaggle:')
             format: File format (auto-detected if None)
             split: Dataset split for HuggingFace datasets
+            config_name: Configuration/subset name for Hugging Face datasets
             
         Returns:
             Pandas DataFrame
         """
         self.source = source
         
-        # Check if it's a local file
+        # 1. Explicit Hugging Face
+        if source.startswith("huggingface:"):
+            clean_source = source.replace("huggingface:", "")
+            return self._load_huggingface(clean_source, split, config_name)
+
+        # 2. Explicit Kaggle
+        if source.startswith("kaggle:"):
+             return self._load_kaggle(source)
+
+        # 3. Local file check
         if Path(source).exists():
             return self._load_local_file(source, format)
         
-        # Try loading from Hugging Face
-        try:
-            return self._load_huggingface(source, split)
-        except Exception:
-            # Fallback for HF failing, or maybe it's a Kaggle dataset
-            pass
+        # 4. Implicit Hugging Face (try if not a file and looks like user/repo)
+        if "/" in source and not source.startswith("kaggle:"):
+            try:
+                print(f"Attempting to load '{source}' as Hugging Face dataset...")
+                return self._load_huggingface(source, split, config_name)
+            except Exception as e:
+                print(f"Not a Hugging Face dataset or failed to load: {e}")
             
-        # Try loading from Kaggle
-        if source.startswith("kaggle:") or "/" in source:
+        # 5. Implicit Kaggle (last resort)
+        if "/" in source:
              try:
+                 print(f"Attempting to load '{source}' as Kaggle dataset...")
                  return self._load_kaggle(source)
-             except Exception as e_kag:
+             except Exception:
                  pass
 
         raise ValueError(
             f"Could not load dataset from '{source}'. "
-            f"Not a valid file path, HuggingFace dataset, or Kaggle dataset."
+            f"Please specify prefix 'huggingface:' or 'kaggle:' if it's not a local file."
         )
     
     def _load_local_file(self, path: str, format: Optional[str] = None) -> pd.DataFrame:
@@ -95,7 +108,12 @@ class DatasetLoader:
         self.format = format
         
         if format == 'csv':
-            self.df = pd.read_csv(path, encoding='utf-8')
+            try:
+                self.df = pd.read_csv(path, encoding='utf-8')
+            except UnicodeDecodeError:
+                # Fallback to latin-1
+                print("Warning: UTF-8 decode failed, trying latin-1")
+                self.df = pd.read_csv(path, encoding='latin-1')
         elif format == 'tsv':
             self.df = pd.read_csv(path, sep='\t', encoding='utf-8')
         elif format == 'json':
@@ -109,11 +127,16 @@ class DatasetLoader:
         
         return self.df
     
-    def _load_huggingface(self, dataset_name: str, split: str = "train") -> pd.DataFrame:
+    def _load_huggingface(self, dataset_name: str, split: str = "train", config_name: Optional[str] = None) -> pd.DataFrame:
         """Load dataset from Hugging Face."""
         self.format = 'huggingface'
         
-        dataset = hf_load_dataset(dataset_name, split=split)
+        if config_name:
+            print(f"Loading Hugging Face dataset: {dataset_name} (config: {config_name})")
+            dataset = hf_load_dataset(dataset_name, config_name, split=split)
+        else:
+            dataset = hf_load_dataset(dataset_name, split=split)
+            
         self.df = dataset.to_pandas()
         
         return self.df

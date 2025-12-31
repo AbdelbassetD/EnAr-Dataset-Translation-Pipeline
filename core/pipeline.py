@@ -35,7 +35,7 @@ class TranslationPipeline:
         enable_fallback: bool = False,
         preserve_all_columns: bool = True,
         normalize_provider_terms: bool = True,
-        checkpoint_dir: Path = CHECKPOINT_DIR,
+        checkpoint_dir: Optional[Path] = None,
         rate_limit_rpm: Optional[int] = 40
     ):
         """
@@ -47,7 +47,7 @@ class TranslationPipeline:
             enable_fallback: Use secondary API if primary fails (default: False)
             preserve_all_columns: Keep all original columns in output
             normalize_provider_terms: Normalize provider-specific terms before translation
-            checkpoint_dir: Directory for checkpoint files
+            checkpoint_dir: Directory for checkpoint files (default: checkpoints/)
             rate_limit_rpm: Requests per minute limit (None to disable)
         """
         self.columns_to_translate = columns_to_translate
@@ -55,7 +55,7 @@ class TranslationPipeline:
         self.enable_fallback = enable_fallback
         self.preserve_all_columns = preserve_all_columns
         self.normalize_provider_terms = normalize_provider_terms
-        self.checkpoint_dir = Path(checkpoint_dir)
+        self.checkpoint_dir = Path(checkpoint_dir) if checkpoint_dir else CHECKPOINT_DIR
         
         # Initialize rate limiter
         from core.rate_limiter import RateLimiter

@@ -63,6 +63,9 @@ python translate.py --dataset kaggle:user/dataset-name --output data/out.csv
 # Translate HuggingFace dataset
 python translate.py --dataset user/dataset-name --columns prompt
 
+# Translate HuggingFace dataset with specific configuration/subset
+python translate.py --dataset lmsys/toxic-chat --subset toxicchat0124 --columns user_input model_output
+
 # Translate local CSV
 python translate.py --input data/file.csv --columns text description --api nvidia
 
@@ -126,6 +129,7 @@ All CLI arguments override corresponding `config.yaml` settings:
   - HuggingFace: `user/dataset-name` or `huggingface:user/dataset`
   - Local file: `path/to/file.csv`
 - `--input PATH` - Alias for `--dataset` (for local files)
+- `--subset NAME` - Configuration/subset name for Hugging Face datasets
 - `--file-name NAME` - Specific file within Kaggle dataset (if multiple files)
 - `--columns COL [COL ...]` - Columns to translate (space-separated) or `auto` for auto-detection
 
@@ -137,11 +141,13 @@ All CLI arguments override corresponding `config.yaml` settings:
 #### Output Options
 - `--output PATH` - Output file path (default: `data/translated_output.csv`)
 - `--format {csv,json,parquet}` - Output format (auto-detected from file extension)
+- `--keep-columns COL [COL ...]` - Specific original columns to keep in output (default: all). Translated columns always included.
 
 #### Performance Options
 - `--limit N` - Translate only first N rows (useful for testing)
 - `--no-checkpoint` - Disable checkpointing
 - `--resume` - Resume from last checkpoint
+- `--checkpoint-dir PATH` - Custom checkpoint directory for parallel translations (default: `checkpoints/`)
 
 ### config.yaml Reference
 

@@ -18,19 +18,19 @@ apis:
   nvidia:
     model: nvidia/riva-translate-4b-instruct-v1.1 # Model to use for translation
     temperature: 0.1 # Temperature for sampling
-    max_tokens: 512 # Maximum number of tokens to generate
+    max_tokens: 7800 # Maximum number of tokens to generate
     top_p: 0.7 # Top-p (nucleus) sampling
     rate_limit_rpm: 40 # Rate limit in requests per minute
   fanar:
     model: Fanar
     temperature: 0.3
-    max_tokens: 1024
+    max_tokens: 4096
     rate_limit_rpm: 40
 
 
 # Retry & Performance
 retry:
-  max_retries: 5
+  max_retries: 10
   backoff_multiplier: 2
   request_timeout: 30
   respect_rate_limits: true

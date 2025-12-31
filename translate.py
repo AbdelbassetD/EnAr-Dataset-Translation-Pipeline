@@ -37,6 +37,7 @@ Examples:
     # Dataset options (override config)
     parser.add_argument("--dataset", help="Dataset source (kaggle:user/dataset, huggingface:dataset, or file path)")
     parser.add_argument("--input", help="Alias for --dataset (for local files)")
+    parser.add_argument("--subset", help="Configuration/subset name for Hugging Face datasets (e.g. toxicchat0124)")
     parser.add_argument("--file-name", help="Specific file within Kaggle dataset")
     parser.add_argument("--columns", nargs="+", help="Columns to translate (or 'auto')")
     
@@ -53,6 +54,8 @@ Examples:
     parser.add_argument("--limit", type=int, help="Limit number of rows (for testing)")
     parser.add_argument("--no-checkpoint", action="store_true", help="Disable checkpointing")
     parser.add_argument("--resume", action="store_true", help="Resume from last checkpoint")
+    parser.add_argument("--checkpoint-dir", help="Custom checkpoint directory (default: checkpoints/)")
+    parser.add_argument("--keep-columns", nargs="+", help="Specific columns to keep in output (default: all)")
     
     args = parser.parse_args()
     
@@ -88,7 +91,7 @@ Examples:
         if args.file_name:
             df = dataset_loader._load_kaggle(dataset_source, args.file_name)
         else:
-            df = dataset_loader.load_dataset(dataset_source)
+            df = dataset_loader.load_dataset(dataset_source, config_name=args.subset)
         print(f"Loaded {len(df)} rows")
     except Exception as e:
         print(f"Error loading dataset: {e}")
@@ -120,7 +123,8 @@ Examples:
         primary_api=primary_api,
         enable_fallback=enable_fallback,
         normalize_provider_terms=normalize_terms,
-        rate_limit_rpm=config['apis'][primary_api]['rate_limit_rpm'] if config['retry']['respect_rate_limits'] else None
+        rate_limit_rpm=config['apis'][primary_api]['rate_limit_rpm'] if config['retry']['respect_rate_limits'] else None,
+        checkpoint_dir=Path(args.checkpoint_dir) if args.checkpoint_dir else None
     )
     
     # Translate
@@ -140,6 +144,17 @@ Examples:
     # Save output
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Filter columns if --keep-columns specified
+    if args.keep_columns:
+        # Always include translated columns
+        translated_cols = [f"{col}_ar" for col in columns] + [f"{col}_api" for col in columns]
+        # Add user-specified columns
+        keep_cols = args.keep_columns + translated_cols
+        # Filter to only existing columns
+        available_cols = [col for col in keep_cols if col in result.columns]
+        result = result[available_cols]
+        print(f"Keeping columns: {available_cols}")
     
     print(f"\nSaving to {output_path}...")
     if output_format == "csv" or str(output_path).endswith('.csv'):
