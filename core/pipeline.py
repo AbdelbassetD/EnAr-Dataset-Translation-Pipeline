@@ -265,12 +265,15 @@ class TranslationPipeline:
         return result_df
     
     def _save_checkpoint(self, df: pd.DataFrame, current_idx: int):
-        """Save checkpoint to disk."""
+        """Save partial checkpoint to disk (only processed rows)."""
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         checkpoint_file = self.checkpoint_dir / f"checkpoint_{current_idx}.csv"
         
-        df.to_csv(checkpoint_file, index=False, encoding='utf-8')
-        self.logger.info(f"Checkpoint saved: {checkpoint_file}")
+        # Only save rows up to current_idx to save space
+        partial_df = df.iloc[:current_idx]
+        partial_df.to_csv(checkpoint_file, index=False, encoding='utf-8')
+        
+        self.logger.info(f"Checkpoint saved: {checkpoint_file} ({len(partial_df)} rows)")
     
     def _load_checkpoint(
         self,
