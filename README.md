@@ -302,19 +302,7 @@ See `examples/` directory for:
 - `huggingface_example.yaml` - HuggingFace dataset
 - `local_csv_example.yaml` - Local CSV file
 
-## 🔒 Security
-
-- **Never commit `.env`** - It's in `.gitignore` by default
-- API keys are loaded from environment variables only
-- Share `.env.example` as a template for colleagues
 
 ## 📄 License
 
 For research purposes in Machine Translation, LLM Security, and Arabic NLP in general.
-
-<!-- ## 🤝 Sharing with Colleagues
-
-1. Share the repository (without `.env`)
-2. Colleague creates their own `.env` from `.env.example`
-3. Colleague edits `config.yaml` for their dataset
-4. Run `python translate.py` -->
